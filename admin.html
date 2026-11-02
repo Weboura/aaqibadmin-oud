@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Vault | The Oud & Co.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 100: '#fef3c7', 300: '#fcd34d', 400: '#fbbf24', 500: '#d97706', 600: '#b45309', 700: '#92400e' },
+                        obsidian: { 900: '#0b0b0d', 800: '#141419', 700: '#1c1c24', 600: '#282833' }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0b0d;
+            color: #e5e7eb;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-serif-title {
+            font-family: 'Cinzel', serif;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b0b0d;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #282833;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b45309;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div
+            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl w-full max-w-md p-8 space-y-6 shadow-2xl text-center">
+            <div
+                class="w-16 h-16 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center text-gold-400 text-2xl mx-auto">
+                <i class="fa-solid fa-vault"></i>
+            </div>
+            <div>
+                <h1 class="font-serif font-bold text-2xl text-white gold-gradient-text">The Vault</h1>
+                <p class="text-xs text-gray-400 mt-1">Authorized personnel only</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <input type="password" id="admin-password" placeholder="Enter Admin Password" required
+                    class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-center text-lg text-white font-mono focus:border-gold-500 outline-none tracking-widest">
+                <button type="submit" id="login-btn"
+                    class="w-full bg-gold-500 hover:bg-gold-400 text-black font-bold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all">
+                    Unlock Vault
+                </button>
+            </form>
+            <p id="login-error" class="text-red-400 text-xs hidden font-bold"></p>
+            <a href="index.html" class="text-gray-500 hover:text-gold-400 text-xs inline-block">← Back to storefront</a>
+        </div>
+    </div>
+
+    <!-- ADMIN PORTAL -->
+    <div id="admin-portal" class="hidden min-h-screen p-4 md:p-8 space-y-6">
+        <div
+            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-sliders text-gold-400 text-2xl"></i>
+                <div>
+                    <h1 class="font-serif font-bold text-2xl text-white">Command Center</h1>
+                    <p class="text-xs text-gray-400">Changes sync live to customer storefront</p>
+                </div>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <a href="index.html" target="_blank"
+                    class="bg-obsidian-800 border border-gold-500/20 text-gold-300 px-4 py-2 rounded-xl text-xs uppercase tracking-wider hover:bg-obsidian-700 transition-all">
+                    <i class="fa-solid fa-external-link mr-1"></i> View Store
+                </a>
+                <button onclick="logoutAdmin()"
+                    class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-xl text-xs uppercase tracking-wider hover:bg-red-500/20 transition-all">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Lock Vault
+                </button>
+            </div>
+        </div>
+
+        <div class="flex border-b border-gold-500/20 text-xs uppercase font-medium tracking-wider gap-4 flex-wrap">
+            <button onclick="switchAdminTab('products')" id="tab-btn-products"
+                class="py-2 border-b-2 border-gold-500 text-gold-400">Product Inventory</button>
+            <button onclick="switchAdminTab('hero')" id="tab-btn-hero"
+                class="py-2 text-gray-400 hover:text-gold-400">Hero Visuals</button>
+            <button onclick="switchAdminTab('orders')" id="tab-btn-orders"
+                class="py-2 text-gray-400 hover:text-gold-400">Live Orders</button>
+        </div>
+
+        <!-- TAB: Products -->
+        <div id="admin-tab-products" class="space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="font-serif font-bold text-white text-lg">Perfume Portfolio</h2>
+                <button onclick="openProductModal()"
+                    class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Add Perfume
+                </button>
+            </div>
+            <div class="overflow-x-auto border border-gold-500/20 rounded-xl">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-obsidian-800 text-gold-400 uppercase tracking-wider border-b border-gold-500/20">
+                        <tr>
+                            <th class="p-3">Perfume</th>
+                            <th class="p-3">House</th>
+                            <th class="p-3">Active Sizes</th>
+                            <th class="p-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-products-tbody" class="divide-y divide-gray-800">
+                        <tr>
+                            <td colspan="4" class="p-6 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: Hero -->
+        <div id="admin-tab-hero" class="hidden space-y-6 bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6">
+            <h2 class="font-serif font-bold text-white text-lg">Hero Section Customizer</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-1">Hero Title</label>
+                        <input type="text" id="admin-hero-title"
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-1">Hero Subtitle</label>
+                        <textarea id="admin-hero-sub" rows="3"
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none"></textarea>
+                    </div>
+                    <button onclick="saveHeroText()"
+                        class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider">
+                        Save Text Changes
+                    </button>
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 mb-1">Hero Background Image</label>
+                    <div id="dropzone-hero" onclick="document.getElementById('file-hero').click()"
+                        class="border-2 border-dashed border-gold-500/30 hover:border-gold-500 bg-obsidian-800/50 rounded-2xl p-6 text-center cursor-pointer transition-all space-y-3">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400"></i>
+                        <p class="text-xs text-gray-300">Click to browse or drop image here</p>
+                        <input type="file" id="file-hero" accept="image/*" class="hidden">
+                    </div>
+                    <div id="hero-preview"
+                        class="mt-3 h-32 bg-obsidian-800 rounded-xl bg-cover bg-center border border-gold-500/20"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Orders -->
+        <div id="admin-tab-orders" class="hidden space-y-4">
+            <h2 class="font-serif font-bold text-white text-lg">Live Customer Orders</h2>
+            <div class="overflow-x-auto border border-gold-500/20 rounded-xl">
+                <table class="w-full text-left text-xs text-gray-300">
+                    <thead class="bg-obsidian-800 text-gold-400 uppercase tracking-wider border-b border-gold-500/20">
+                        <tr>
+                            <th class="p-3">Order</th>
+                            <th class="p-3">Customer</th>
+                            <th class="p-3">Phone</th>
+                            <th class="p-3">Total</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-orders-tbody" class="divide-y divide-gray-800">
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal"
+        class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div
+            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-4 my-8 relative">
+            <button onclick="closeProductModal()"
+                class="absolute top-5 right-5 text-gray-400 hover:text-gold-400 text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="product-modal-title" class="font-serif font-bold text-2xl text-white">Add New Perfume</h3>
+            <form id="product-form" class="space-y-4">
+                <input type="hidden" id="prod-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-1">Name *</label>
+                        <input type="text" id="prod-name" required
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-1">House / Brand *</label>
+                        <input type="text" id="prod-house" required
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- SIZES & PRICES (Removed 'required' so you can leave blank) -->
+                <div
+                    class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-obsidian-800/50 p-3 rounded-xl border border-gold-500/10">
+                    <div>
+                        <label
+                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
+                            <input type="checkbox" id="prod-active-5ml" checked class="accent-gold-500 w-4 h-4"> 5ml
+                        </label>
+                        <input type="number" id="prod-price-5ml" placeholder="Blank = hide"
+                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label
+                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
+                            <input type="checkbox" id="prod-active-10ml" checked class="accent-gold-500 w-4 h-4"> 10ml
+                        </label>
+                        <input type="number" id="prod-price-10ml" placeholder="Blank = hide"
+                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label
+                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
+                            <input type="checkbox" id="prod-active-50ml" checked class="accent-gold-500 w-4 h-4"> 50ml
+                        </label>
+                        <input type="number" id="prod-price-50ml" placeholder="Blank = hide"
+                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label
+                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
+                            <input type="checkbox" id="prod-active-100ml" checked class="accent-gold-500 w-4 h-4"> 100ml
+                        </label>
+                        <input type="number" id="prod-price-100ml" placeholder="Blank = hide"
+                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase text-gray-400 mb-1">Image</label>
+                    <div onclick="document.getElementById('file-prod').click()"
+                        class="border-2 border-dashed border-gold-500/30 hover:border-gold-500 bg-obsidian-800/50 rounded-xl p-4 text-center cursor-pointer">
+                        <i class="fa-solid fa-image text-2xl text-gold-400 mb-1"></i>
+                        <p class="text-xs text-gray-300">Click to upload image</p>
+                        <input type="file" id="file-prod" accept="image/*" class="hidden">
+                    </div>
+                    <input type="text" id="prod-image-url" placeholder="Or paste image URL"
+                        class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2.5 text-xs text-white mt-2 focus:border-gold-500 outline-none">
+                    <div id="prod-image-preview"
+                        class="mt-2 h-24 bg-obsidian-800 rounded-xl bg-cover bg-center border border-gold-500/20"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Top Notes</label>
+                        <input type="text" id="prod-notes-top"
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Heart Notes</label>
+                        <input type="text" id="prod-notes-heart"
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Base Notes</label>
+                        <input type="text" id="prod-notes-base"
+                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
+                    </div>
+                </div>
+                <button type="submit" id="product-submit-btn"
+                    class="w-full bg-gold-500 hover:bg-gold-400 text-black font-bold py-3 rounded-xl uppercase tracking-widest text-xs transition-all">
+                    Save Perfume
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE IMPORTS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqFryRAL-i0DNzyXvki4nfjLcX5EclUzI",
+            authDomain: "theoudco-7955e.firebaseapp.com",
+            projectId: "theoudco-7955e",
+            storageBucket: "theoudco-7955e.firebasestorage.app",
+            messagingSenderId: "18660316570",
+            appId: "1:18660316570:web:e14d768616830632d85623",
+            measurementId: "G-MK1L3F4BW9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const productsCol = collection(db, "products");
+        const ordersCol = collection(db, "orders");
+        const settingsDoc = doc(db, "settings", "siteConfig");
+
+        window.FB = { db, productsCol, ordersCol, settingsDoc, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, setDoc };
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+
+    <script>
+        let products = [];
+        let orders = [];
+        let uploadedProductImageBase64 = '';
+        let listenersAttached = false;
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (document.getElementById('admin-password').value === 'aaqibahmed2009') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-portal').classList.remove('hidden');
+                if (window.FB) attachListeners();
+                else window.addEventListener('firebase-ready', attachListeners);
+            } else {
+                document.getElementById('login-error').innerText = '❌ Invalid Vault Passcode';
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        window.logoutAdmin = function () {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-portal').classList.add('hidden');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+        };
+
+        function attachListeners() {
+            if (listenersAttached) return;
+            listenersAttached = true;
+            const { productsCol, ordersCol, settingsDoc, onSnapshot, query, orderBy } = window.FB;
+
+            onSnapshot(query(productsCol, orderBy('createdAt', 'desc')), (snap) => {
+                products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderProductsTable();
+            });
+
+            onSnapshot(query(ordersCol, orderBy('createdAt', 'desc')), (snap) => {
+                orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderOrdersTable();
+            });
+
+            onSnapshot(settingsDoc, (snap) => {
+                const cfg = snap.exists() ? snap.data() : {};
+                document.getElementById('admin-hero-title').value = cfg.heroTitle || '';
+                document.getElementById('admin-hero-sub').value = cfg.heroSubtext || '';
+                if (cfg.heroImage) document.getElementById('hero-preview').style.backgroundImage = `url('${cfg.heroImage}')`;
+            });
+        }
+
+        window.switchAdminTab = function (tab) {
+            ['products', 'hero', 'orders'].forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = 'py-2 text-gray-400 hover:text-gold-400';
+            });
+            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = 'py-2 border-b-2 border-gold-500 text-gold-400';
+        };
+
+        function renderProductsTable() {
+            const tbody = document.getElementById('admin-products-tbody');
+            if (products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-500">No products yet.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = products.map(p => {
+                const activeSizes = p.activeSizes || [];
+                return `
+                <tr>
+                    <td class="p-3 font-semibold text-white flex items-center gap-2">
+                        <img src="${p.image}" class="w-8 h-8 rounded object-cover" onerror="this.style.display='none'"> ${p.name}
+                    </td>
+                    <td class="p-3 text-gray-400">${p.house}</td>
+                    <td class="p-3 text-gold-400 font-mono">${activeSizes.join(', ')}</td>
+                    <td class="p-3 text-right whitespace-nowrap">
+                        <button onclick="editProduct('${p.id}')" class="text-gold-400 hover:underline mr-3">Edit</button>
+                        <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:underline">Delete</button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderOrdersTable() {
+            const tbody = document.getElementById('admin-orders-tbody');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">No orders yet.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td class="p-3 font-mono text-gold-400">#${o.id.slice(0, 8).toUpperCase()}</td>
+                    <td class="p-3 text-white">${o.customerName}</td>
+                    <td class="p-3">${o.phone}</td>
+                    <td class="p-3 font-bold text-gold-300">Rs. ${(o.total || 0).toLocaleString()}</td>
+                    <td class="p-3">
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-obsidian-800 border border-gold-500/30 rounded-lg px-2 py-1 text-[11px] text-white outline-none">
+                            ${['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td class="p-3"><button onclick="viewOrder('${o.id}')" class="text-gold-400 hover:underline text-[11px]">View</button></td>
+                </tr>
+            `).join('');
+        }
+
+        window.updateOrderStatus = async function (orderId, status) {
+            const { db, doc, updateDoc } = window.FB;
+            try { await updateDoc(doc(db, 'orders', orderId), { status }); showToast(`Order marked as ${status}`); } catch (e) { alert(e.message); }
+        };
+
+        window.viewOrder = function (orderId) {
+            const o = orders.find(x => x.id === orderId);
+            if (!o) return;
+            const items = (o.items || []).map(i => `${i.qty}× ${i.name} (${i.size})`).join('\n');
+            alert(`ORDER #${o.id.slice(0, 8).toUpperCase()}\n\nCustomer: ${o.customerName}\nPhone: ${o.phone}\nCity: ${o.city}\nAddress: ${o.address}\n\nITEMS:\n${items}\n\nTOTAL: Rs. ${(o.total || 0).toLocaleString()}`);
+        };
+
+        window.openProductModal = function () {
+            document.getElementById('product-form').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('prod-image-url').value = '';
+            document.getElementById('prod-image-preview').style.backgroundImage = '';
+            document.getElementById('prod-active-5ml').checked = true;
+            document.getElementById('prod-active-10ml').checked = true;
+            document.getElementById('prod-active-50ml').checked = true;
+            document.getElementById('prod-active-100ml').checked = true;
+            uploadedProductImageBase64 = '';
+            document.getElementById('product-modal-title').innerText = 'Add New Perfume';
+            document.getElementById('product-modal').classList.remove('hidden');
+        };
+
+        window.closeProductModal = function () { document.getElementById('product-modal').classList.add('hidden'); };
+
+        document.getElementById('product-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const { db, productsCol, doc, addDoc, updateDoc, serverTimestamp } = window.FB;
+            const id = document.getElementById('prod-id').value;
+            const btn = document.getElementById('product-submit-btn');
+
+            // Get active sizes dynamically based on what has a price entered AND is checked
+            const activeSizes = [];
+            const p5 = document.getElementById('prod-price-5ml').value;
+            const p10 = document.getElementById('prod-price-10ml').value;
+            const p50 = document.getElementById('prod-price-50ml').value;
+            const p100 = document.getElementById('prod-price-100ml').value;
+
+            if (document.getElementById('prod-active-5ml').checked && p5) activeSizes.push('5ml');
+            if (document.getElementById('prod-active-10ml').checked && p10) activeSizes.push('10ml');
+            if (document.getElementById('prod-active-50ml').checked && p50) activeSizes.push('50ml');
+            if (document.getElementById('prod-active-100ml').checked && p100) activeSizes.push('100ml');
+
+            // Block save if no sizes were filled out
+            if (activeSizes.length === 0) {
+                alert("Please enter a price for at least one size.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            const data = {
+                name: document.getElementById('prod-name').value.trim(),
+                house: document.getElementById('prod-house').value.trim(),
+                image: uploadedProductImageBase64 || document.getElementById('prod-image-url').value.trim() || 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=800&auto=format&fit=crop',
+                activeSizes: activeSizes,
+                prices: {
+                    '5ml': p5 ? Number(p5) : 0,
+                    '10ml': p10 ? Number(p10) : 0,
+                    '50ml': p50 ? Number(p50) : 0,
+                    '100ml': p100 ? Number(p100) : 0
+                },
+                notes: {
+                    top: document.getElementById('prod-notes-top').value.trim() || 'N/A',
+                    heart: document.getElementById('prod-notes-heart').value.trim() || 'N/A',
+                    base: document.getElementById('prod-notes-base').value.trim() || 'N/A'
+                },
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'products', id), data);
+                    showToast('Perfume updated!');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(productsCol, data);
+                    showToast('Perfume added!');
+                }
+                closeProductModal();
+            } catch (err) { alert('Save failed: ' + err.message); } finally { btn.disabled = false; btn.innerText = 'Save Perfume'; }
+        });
+
+        window.editProduct = function (id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-house').value = p.house;
+
+            // Set values (0 becomes empty string so placeholder shows)
+            document.getElementById('prod-price-5ml').value = p.prices?.['5ml'] || '';
+            document.getElementById('prod-price-10ml').value = p.prices?.['10ml'] || '';
+            document.getElementById('prod-price-50ml').value = p.prices?.['50ml'] || '';
+            document.getElementById('prod-price-100ml').value = p.prices?.['100ml'] || '';
+
+            document.getElementById('prod-image-url').value = p.image;
+            document.getElementById('prod-image-preview').style.backgroundImage = `url('${p.image}')`;
+            document.getElementById('prod-notes-top').value = p.notes?.top || '';
+            document.getElementById('prod-notes-heart').value = p.notes?.heart || '';
+            document.getElementById('prod-notes-base').value = p.notes?.base || '';
+
+            const active = p.activeSizes || [];
+            document.getElementById('prod-active-5ml').checked = active.includes('5ml');
+            document.getElementById('prod-active-10ml').checked = active.includes('10ml');
+            document.getElementById('prod-active-50ml').checked = active.includes('50ml');
+            document.getElementById('prod-active-100ml').checked = active.includes('100ml');
+
+            uploadedProductImageBase64 = p.image;
+            document.getElementById('product-modal-title').innerText = 'Edit Perfume';
+            document.getElementById('product-modal').classList.remove('hidden');
+        };
+
+        window.deleteProduct = async function (id) {
+            if (!confirm('Delete this fragrance?')) return;
+            const { db, doc, deleteDoc } = window.FB;
+            try { await deleteDoc(doc(db, 'products', id)); showToast('Perfume deleted!'); } catch (e) { alert(e.message); }
+        };
+
+        function processImageFile(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600, MAX_HEIGHT = 800;
+                    let width = img.width, height = img.height;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('file-prod').addEventListener('change', function (e) {
+            const file = e.target.files[0]; if (!file) return;
+            processImageFile(file, (base64) => {
+                uploadedProductImageBase64 = base64;
+                document.getElementById('prod-image-preview').style.backgroundImage = `url('${base64}')`;
+                document.getElementById('prod-image-url').value = '';
+                showToast('Image ready to save!');
+            });
+        });
+
+        document.getElementById('file-hero').addEventListener('change', function (e) {
+            const file = e.target.files[0]; if (!file) return;
+            processImageFile(file, async (base64) => {
+                document.getElementById('hero-preview').style.backgroundImage = `url('${base64}')`;
+                const { settingsDoc, updateDoc, setDoc } = window.FB;
+                try { await updateDoc(settingsDoc, { heroImage: base64 }); }
+                catch (err) { if (err.code === 'not-found') await setDoc(settingsDoc, { heroImage: base64 }, { merge: true }); }
+                showToast('Hero image saved!');
+            });
+        });
+
+        window.saveHeroText = async function () {
+            const { settingsDoc, updateDoc, setDoc } = window.FB;
+            const data = { heroTitle: document.getElementById('admin-hero-title').value.trim(), heroSubtext: document.getElementById('admin-hero-sub').value.trim() };
+            try { await updateDoc(settingsDoc, data); }
+            catch (err) { if (err.code === 'not-found') await setDoc(settingsDoc, data, { merge: true }); }
+            showToast('Hero text saved!');
+        };
+
+        function showToast(msg) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'bg-obsidian-800 border-l-4 border-l-gold-500 border border-gold-500/20 text-gold-300 px-4 py-3 rounded-xl shadow-2xl text-xs flex items-center gap-2 pointer-events-auto';
+            t.innerHTML = `<i class="fa-solid fa-circle-check text-gold-400"></i> ${msg}`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+    </script>
+</body>
+
+</html>
