@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Admin Vault | The Oud & Co.</title>
+    <title>The Oud & Co. | Bespoke Perfume Decants & Niche Fragrances</title>
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="hcgG951oP_BmB4KnlUdI3AkJkh4iqcQwuI_7qKGR3bY" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,6 +27,8 @@
             }
         };
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -66,261 +71,370 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #b45309;
         }
+
+        /* Hide default loading text until data arrives */
+        #products-grid:empty {
+            display: none;
+        }
     </style>
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-black">
 
-    <div id="toast-container" class="fixed top-5 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div
-            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl w-full max-w-md p-8 space-y-6 shadow-2xl text-center">
-            <div
-                class="w-16 h-16 bg-gold-500/10 border border-gold-500/30 rounded-full flex items-center justify-center text-gold-400 text-2xl mx-auto">
-                <i class="fa-solid fa-vault"></i>
-            </div>
+    <!-- Navigation -->
+    <nav
+        class="sticky top-0 z-40 bg-obsidian-900/90 backdrop-blur-md border-b border-gold-500/20 px-4 md:px-12 py-4 flex items-center justify-between transition-all">
+        <a href="#" class="flex items-center gap-3 group">
             <div>
-                <h1 class="font-serif font-bold text-2xl text-white gold-gradient-text">The Vault</h1>
-                <p class="text-xs text-gray-400 mt-1">Authorized personnel only</p>
+                <span
+                    class="font-serif font-bold text-xl md:text-2xl tracking-wider gold-gradient-text block leading-none">THE
+                    OUD & CO.</span>
+                <span class="text-[9px] text-gray-400 tracking-[0.3em] uppercase block">Haute Parfumerie Decants</span>
             </div>
-            <form id="login-form" class="space-y-4">
-                <input type="password" id="admin-password" placeholder="Enter Admin Password" required
-                    class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-center text-lg text-white font-mono focus:border-gold-500 outline-none tracking-widest">
-                <button type="submit" id="login-btn"
-                    class="w-full bg-gold-500 hover:bg-gold-400 text-black font-bold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all">
-                    Unlock Vault
-                </button>
-            </form>
-            <p id="login-error" class="text-red-400 text-xs hidden font-bold"></p>
-            <a href="index.html" class="text-gray-500 hover:text-gold-400 text-xs inline-block">← Back to storefront</a>
+        </a>
+        <div class="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest font-medium text-gray-300">
+            <a href="#catalog" class="hover:text-gold-400 transition-colors">Catalog</a>
+            <a href="#sizes" class="hover:text-gold-400 transition-colors">Decant Sizes</a>
+            <a href="tel:0789491209"
+                class="text-gold-400 hover:text-gold-300 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-phone text-xs"></i> 0789491209
+            </a>
         </div>
-    </div>
-
-    <!-- ADMIN PORTAL -->
-    <div id="admin-portal" class="hidden min-h-screen p-4 md:p-8 space-y-6">
-        <div
-            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-sliders text-gold-400 text-2xl"></i>
-                <div>
-                    <h1 class="font-serif font-bold text-2xl text-white">Command Center</h1>
-                    <p class="text-xs text-gray-400">Changes sync live to customer storefront</p>
-                </div>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-                <a href="index.html" target="_blank"
-                    class="bg-obsidian-800 border border-gold-500/20 text-gold-300 px-4 py-2 rounded-xl text-xs uppercase tracking-wider hover:bg-obsidian-700 transition-all">
-                    <i class="fa-solid fa-external-link mr-1"></i> View Store
-                </a>
-                <button onclick="logoutAdmin()"
-                    class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-xl text-xs uppercase tracking-wider hover:bg-red-500/20 transition-all">
-                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Lock Vault
-                </button>
-            </div>
-        </div>
-
-        <div class="flex border-b border-gold-500/20 text-xs uppercase font-medium tracking-wider gap-4 flex-wrap">
-            <button onclick="switchAdminTab('products')" id="tab-btn-products"
-                class="py-2 border-b-2 border-gold-500 text-gold-400">Product Inventory</button>
-            <button onclick="switchAdminTab('hero')" id="tab-btn-hero"
-                class="py-2 text-gray-400 hover:text-gold-400">Hero Visuals</button>
-            <button onclick="switchAdminTab('orders')" id="tab-btn-orders"
-                class="py-2 text-gray-400 hover:text-gold-400">Live Orders</button>
-        </div>
-
-        <!-- TAB: Products -->
-        <div id="admin-tab-products" class="space-y-4">
-            <div class="flex justify-between items-center">
-                <h2 class="font-serif font-bold text-white text-lg">Perfume Portfolio</h2>
-                <button onclick="openProductModal()"
-                    class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Add Perfume
-                </button>
-            </div>
-            <div class="overflow-x-auto border border-gold-500/20 rounded-xl">
-                <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-obsidian-800 text-gold-400 uppercase tracking-wider border-b border-gold-500/20">
-                        <tr>
-                            <th class="p-3">Perfume</th>
-                            <th class="p-3">House</th>
-                            <th class="p-3">Active Sizes</th>
-                            <th class="p-3 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-products-tbody" class="divide-y divide-gray-800">
-                        <tr>
-                            <td colspan="4" class="p-6 text-center text-gray-500">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: Hero -->
-        <div id="admin-tab-hero" class="hidden space-y-6 bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6">
-            <h2 class="font-serif font-bold text-white text-lg">Hero Section Customizer</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Hero Title</label>
-                        <input type="text" id="admin-hero-title"
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Hero Subtitle</label>
-                        <textarea id="admin-hero-sub" rows="3"
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none"></textarea>
-                    </div>
-                    <button onclick="saveHeroText()"
-                        class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider">
-                        Save Text Changes
-                    </button>
-                </div>
-                <div>
-                    <label class="block text-xs uppercase text-gray-400 mb-1">Hero Background Image</label>
-                    <div id="dropzone-hero" onclick="document.getElementById('file-hero').click()"
-                        class="border-2 border-dashed border-gold-500/30 hover:border-gold-500 bg-obsidian-800/50 rounded-2xl p-6 text-center cursor-pointer transition-all space-y-3">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400"></i>
-                        <p class="text-xs text-gray-300">Click to browse or drop image here</p>
-                        <input type="file" id="file-hero" accept="image/*" class="hidden">
-                    </div>
-                    <div id="hero-preview"
-                        class="mt-3 h-32 bg-obsidian-800 rounded-xl bg-cover bg-center border border-gold-500/20"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB: Orders -->
-        <div id="admin-tab-orders" class="hidden space-y-4">
-            <h2 class="font-serif font-bold text-white text-lg">Live Customer Orders</h2>
-            <div class="overflow-x-auto border border-gold-500/20 rounded-xl">
-                <table class="w-full text-left text-xs text-gray-300">
-                    <thead class="bg-obsidian-800 text-gold-400 uppercase tracking-wider border-b border-gold-500/20">
-                        <tr>
-                            <th class="p-3">Order</th>
-                            <th class="p-3">Customer</th>
-                            <th class="p-3">Phone</th>
-                            <th class="p-3">Total</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-orders-tbody" class="divide-y divide-gray-800">
-                        <tr>
-                            <td colspan="6" class="p-6 text-center text-gray-500">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Product Modal -->
-    <div id="product-modal"
-        class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-        <div
-            class="bg-obsidian-900 border border-gold-500/30 rounded-2xl w-full max-w-2xl p-6 md:p-8 space-y-4 my-8 relative">
-            <button onclick="closeProductModal()"
-                class="absolute top-5 right-5 text-gray-400 hover:text-gold-400 text-xl">
-                <i class="fa-solid fa-xmark"></i>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleCartDrawer()"
+                class="relative bg-obsidian-800 hover:bg-obsidian-700 border border-gold-500/30 text-gold-400 p-2.5 rounded-full transition-all flex items-center justify-center">
+                <i class="fa-solid fa-bag-shopping text-lg"></i>
+                <span id="cart-badge"
+                    class="absolute -top-1 -right-1 bg-gold-500 text-black font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-md">0</span>
             </button>
-            <h3 id="product-modal-title" class="font-serif font-bold text-2xl text-white">Add New Perfume</h3>
-            <form id="product-form" class="space-y-4">
-                <input type="hidden" id="prod-id">
+            <button onclick="toggleMobileMenu()" class="md:hidden text-gray-300 hover:text-gold-400 p-2 text-xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu"
+        class="hidden fixed inset-0 z-30 bg-obsidian-900/95 backdrop-blur-xl flex-col items-center justify-center gap-8 text-xl uppercase tracking-widest font-serif border-b border-gold-500/20">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-gray-400 hover:text-gold-400 text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <a href="#catalog" onclick="toggleMobileMenu()" class="hover:text-gold-400 transition-colors">Catalog</a>
+        <a href="#sizes" onclick="toggleMobileMenu()" class="hover:text-gold-400 transition-colors">Decant Sizes</a>
+        <a href="tel:0789491209" class="text-gold-400 hover:text-gold-300 flex items-center gap-2">
+            <i class="fa-solid fa-phone"></i> 0789491209
+        </a>
+    </div>
+
+    <!-- Hero (Starts pure black, only shows admin uploaded image) -->
+    <header class="relative min-h-[80vh] flex items-center justify-center overflow-hidden px-4 py-20 bg-obsidian-900">
+        <!-- Removed the hardcoded default image completely -->
+        <div id="hero-bg-container"
+            class="absolute inset-0 z-0 opacity-0 bg-cover bg-center transition-all duration-1000"></div>
+        <div class="absolute inset-0 z-0 bg-gradient-to-t from-obsidian-900 via-obsidian-900/70 to-transparent"></div>
+
+        <div class="relative z-10 max-w-4xl text-center space-y-6">
+            <div
+                class="inline-block border border-gold-500/40 px-4 py-1.5 rounded-full bg-obsidian-800/80 text-gold-300 text-xs uppercase tracking-[0.25em] backdrop-blur-sm">
+                Authentic Niche & Designer Decants
+            </div>
+            <!-- Blank text until admin loads it -->
+            <h1 id="hero-heading"
+                class="text-4xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-wide gold-gradient-text">
+            </h1>
+            <p id="hero-subtext"
+                class="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
+            </p>
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#catalog"
+                    class="w-full sm:w-auto bg-gradient-to-r from-gold-500 to-gold-700 text-black font-semibold px-8 py-4 rounded-full hover:brightness-110 transition-all uppercase tracking-widest text-xs shadow-lg shadow-gold-500/20">
+                    Explore Luxury Catalog
+                </a>
+                <a href="#sizes"
+                    class="w-full sm:w-auto border border-gold-500/40 text-gold-300 hover:bg-gold-500/10 font-semibold px-8 py-4 rounded-full transition-all uppercase tracking-widest text-xs">
+                    View Atomizer Sizes
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sizes -->
+    <section id="sizes" class="py-20 px-4 md:px-12 bg-obsidian-800/50 border-y border-gold-500/10">
+        <div class="max-w-7xl mx-auto text-center space-y-4 mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold gold-gradient-text uppercase tracking-wider">Precision Glass
+                Decants</h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">Every drop is meticulously drawn directly
+                from original formulation flacons into sterile atomizers.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <div
+                class="bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6 text-center space-y-4 hover:border-gold-500/60 transition-all group">
+                <div
+                    class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400 text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-vial"></i></div>
+                <h3 class="font-serif font-bold text-xl text-white">5ml Pocket Atomizer</h3>
+                <p class="text-xs text-gold-400 uppercase tracking-widest">~75 Sprays</p>
+                <p class="text-gray-400 text-xs leading-relaxed">Perfect for testing skin chemistry and carrying your
+                    signature scent wherever you travel.</p>
+            </div>
+            <div
+                class="bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6 text-center space-y-4 hover:border-gold-500/60 transition-all group relative">
+                <span
+                    class="absolute top-3 right-3 bg-gold-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Popular</span>
+                <div
+                    class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400 text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-spray-can"></i></div>
+                <h3 class="font-serif font-bold text-xl text-white">10ml Fine Spray</h3>
+                <p class="text-xs text-gold-400 uppercase tracking-widest">~150 Sprays</p>
+                <p class="text-gray-400 text-xs leading-relaxed">Heavyweight glass cylinder with fine mist pump. Lasts
+                    over 1 month of daily wear.</p>
+            </div>
+            <div
+                class="bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6 text-center space-y-4 hover:border-gold-500/60 transition-all group">
+                <div
+                    class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400 text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-wine-bottle"></i></div>
+                <h3 class="font-serif font-bold text-xl text-white">50ml Executive Flacon</h3>
+                <p class="text-xs text-gold-400 uppercase tracking-widest">~750 Sprays</p>
+                <p class="text-gray-400 text-xs leading-relaxed">Generous luxury decant bottle crafted with heavy
+                    crystal glass for prolonged rotation.</p>
+            </div>
+            <div
+                class="bg-obsidian-900 border border-gold-500/20 rounded-2xl p-6 text-center space-y-4 hover:border-gold-500/60 transition-all group">
+                <div
+                    class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400 text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-gem"></i></div>
+                <h3 class="font-serif font-bold text-xl text-white">100ml Grand Collector</h3>
+                <p class="text-xs text-gold-400 uppercase tracking-widest">~1500 Sprays</p>
+                <p class="text-gray-400 text-xs leading-relaxed">Bespoke full-size presentation bottle with metallic
+                    engraved emblem for connoisseurs.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catalog -->
+    <section id="catalog" class="py-20 px-4 md:px-12 max-w-7xl mx-auto w-full">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div>
+                <span class="text-gold-400 text-xs uppercase tracking-[0.3em] font-semibold">Hand-Selected
+                    Portfolio</span>
+                <h2 class="text-3xl md:text-5xl font-bold gold-gradient-text tracking-wide mt-1">Curated Scents</h2>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact"
+        class="bg-obsidian-900 border-t border-gold-500/20 pt-16 pb-12 px-4 md:px-12 text-gray-400 text-sm">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+            <div class="space-y-4 md:col-span-1">
+                <span class="font-serif font-bold text-2xl gold-gradient-text block">THE OUD & CO.</span>
+                <p class="text-xs text-gray-400 leading-relaxed">Exclusive haute parfumerie decants delivered directly
+                    to your doorstep with elegance and care.</p>
+
+                <!-- SOCIAL LINKS -->
+                <div class="flex gap-4 text-gold-400 text-lg pt-2">
+                    <a href="https://www.instagram.com/the.oud.and.co?rpxt=MXM3cGVyM2oxb2FicQ==" target="_blank"
+                        rel="noopener noreferrer" class="hover:text-gold-300 transition-colors" title="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@goated.store1?_r=1&_t=ZS-9B41BgHtQPp" target="_blank"
+                        rel="noopener noreferrer" class="hover:text-gold-300 transition-colors" title="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="https://wa.me/94789491209?text=Hello%20The%20Oud%20%26%20Co.%2C%20I%20would%20like%20to%20inquire%20about%20your%20perfume%20decants."
+                        target="_blank" rel="noopener noreferrer"
+                        class="hover:text-gold-300 transition-colors text-emerald-400" title="WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-white text-base mb-4 tracking-wider uppercase">Contact Support</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><i class="fa-solid fa-phone text-gold-400 mr-2"></i> Hotlines: <a href="tel:0789491209"
+                            class="text-gray-300 hover:text-gold-400">0789491209</a></li>
+                    <li><i class="fa-solid fa-location-dot text-gold-400 mr-2"></i> Store: Colombo, Sri Lanka</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-white text-base mb-4 tracking-wider uppercase">Decant Assurance
+                </h4>
+                <p class="text-xs text-gray-400 leading-relaxed">100% Authentic scents drawn from fresh master batches.
+                    Every decant is sealed with tamper-proof teflon tape to prevent leakage.</p>
+            </div>
+        </div>
+        <div
+            class="max-w-7xl mx-auto border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+            <p>&copy; 2026 The Oud & Co. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer"
+        class="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-obsidian-900 border-l border-gold-500/20 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-gold-500/20 flex items-center justify-between bg-obsidian-800/50">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-bag-shopping text-gold-400 text-xl"></i>
+                <h3 class="font-serif font-bold text-lg text-white">Your Decant Selection</h3>
+            </div>
+            <button onclick="toggleCartDrawer()" class="text-gray-400 hover:text-gold-400 text-xl p-1"><i
+                    class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+        <div class="p-6 border-t border-gold-500/20 bg-obsidian-800/80 space-y-4">
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-400">Subtotal</span>
+                <span id="cart-total-price" class="font-serif font-bold text-xl gold-gradient-text">Rs. 0</span>
+            </div>
+            <button onclick="openCheckoutModal()"
+                class="w-full bg-gradient-to-r from-gold-500 to-gold-700 text-black font-bold py-3.5 rounded-full hover:brightness-110 transition-all uppercase tracking-widest text-xs shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+    <div id="cart-backdrop" onclick="toggleCartDrawer()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40">
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div
+            class="bg-[#121214] border border-gray-800 rounded-2xl w-full max-w-xl p-6 relative shadow-2xl max-h-[95vh] overflow-y-auto custom-scrollbar">
+
+            <!-- Top Header with Back Button -->
+            <div class="flex justify-between items-start mb-5">
+                <div class="space-y-1">
+                    <span class="text-gold-500 text-[10px] font-bold uppercase tracking-[0.2em]">Order Completion</span>
+                    <h3 class="font-serif font-bold text-2xl text-white">Checkout Details</h3>
+                </div>
+                <!-- Back to Cart Button -->
+                <button onclick="backToCart()"
+                    class="text-gray-400 hover:text-white flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold transition-colors mt-1 bg-[#1a1a1e] px-3 py-1.5 rounded-lg border border-gray-800">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Cart
+                </button>
+            </div>
+
+            <form id="checkout-form" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Name *</label>
-                        <input type="text" id="prod-name" required
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">House / Brand *</label>
-                        <input type="text" id="prod-house" required
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-3 text-sm text-white focus:border-gold-500 outline-none">
-                    </div>
-                </div>
-
-                <!-- SIZES & PRICES (Removed 'required' so you can leave blank) -->
-                <div
-                    class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-obsidian-800/50 p-3 rounded-xl border border-gold-500/10">
-                    <div>
                         <label
-                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
-                            <input type="checkbox" id="prod-active-5ml" checked class="accent-gold-500 w-4 h-4"> 5ml
-                        </label>
-                        <input type="number" id="prod-price-5ml" placeholder="Blank = hide"
-                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                            class="block text-[10px] uppercase text-gray-400 mb-1.5 tracking-wider font-semibold">Full
+                            Name *</label>
+                        <input type="text" id="cust-name" required
+                            class="w-full bg-[#1a1a1e] border border-gray-800 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none transition-colors">
                     </div>
                     <div>
                         <label
-                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
-                            <input type="checkbox" id="prod-active-10ml" checked class="accent-gold-500 w-4 h-4"> 10ml
-                        </label>
-                        <input type="number" id="prod-price-10ml" placeholder="Blank = hide"
-                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label
-                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
-                            <input type="checkbox" id="prod-active-50ml" checked class="accent-gold-500 w-4 h-4"> 50ml
-                        </label>
-                        <input type="number" id="prod-price-50ml" placeholder="Blank = hide"
-                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label
-                            class="flex items-center gap-2 text-[11px] uppercase text-gold-400 mb-2 font-bold cursor-pointer">
-                            <input type="checkbox" id="prod-active-100ml" checked class="accent-gold-500 w-4 h-4"> 100ml
-                        </label>
-                        <input type="number" id="prod-price-100ml" placeholder="Blank = hide"
-                            class="w-full bg-obsidian-900 border border-gold-500/20 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none">
+                            class="block text-[10px] uppercase text-gray-400 mb-1.5 tracking-wider font-semibold">Email
+                            Address (Optional)</label>
+                        <input type="email" id="cust-email"
+                            class="w-full bg-[#1a1a1e] border border-gray-800 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none transition-colors">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs uppercase text-gray-400 mb-1">Image</label>
-                    <div onclick="document.getElementById('file-prod').click()"
-                        class="border-2 border-dashed border-gold-500/30 hover:border-gold-500 bg-obsidian-800/50 rounded-xl p-4 text-center cursor-pointer">
-                        <i class="fa-solid fa-image text-2xl text-gold-400 mb-1"></i>
-                        <p class="text-xs text-gray-300">Click to upload image</p>
-                        <input type="file" id="file-prod" accept="image/*" class="hidden">
-                    </div>
-                    <input type="text" id="prod-image-url" placeholder="Or paste image URL"
-                        class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2.5 text-xs text-white mt-2 focus:border-gold-500 outline-none">
-                    <div id="prod-image-preview"
-                        class="mt-2 h-24 bg-obsidian-800 rounded-xl bg-cover bg-center border border-gold-500/20"></div>
+                    <label
+                        class="block text-[10px] uppercase text-gray-400 mb-1.5 tracking-wider font-semibold">Delivery
+                        City *</label>
+                    <input type="text" id="cust-city" required oninput="checkCityForCOD()" placeholder="e.g. Colombo"
+                        class="w-full bg-[#1a1a1e] border border-gray-800 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none transition-colors">
                 </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Top Notes</label>
-                        <input type="text" id="prod-notes-top"
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Heart Notes</label>
-                        <input type="text" id="prod-notes-heart"
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase text-gray-400 mb-1">Base Notes</label>
-                        <input type="text" id="prod-notes-base"
-                            class="w-full bg-obsidian-800 border border-gold-500/20 rounded-xl p-2 text-xs text-white focus:border-gold-500 outline-none">
-                    </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase text-gray-400 mb-1.5 tracking-wider font-semibold">Sri
+                        Lankan Contact Number (10 Digits) *</label>
+                    <input type="tel" id="cust-phone" required maxlength="10" oninput="validateSLPhoneNumber(this)"
+                        placeholder="0789491209"
+                        class="w-full bg-[#1a1a1e] border border-gray-800 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none tracking-wider transition-colors">
                 </div>
-                <button type="submit" id="product-submit-btn"
-                    class="w-full bg-gold-500 hover:bg-gold-400 text-black font-bold py-3 rounded-xl uppercase tracking-widest text-xs transition-all">
-                    Save Perfume
-                </button>
+
+                <div>
+                    <label
+                        class="block text-[10px] uppercase text-gray-400 mb-1.5 tracking-wider font-semibold">Shipping
+                        Address *</label>
+                    <textarea id="cust-address" required rows="2" placeholder="Street, Apartment / House No."
+                        class="w-full bg-[#1a1a1e] border border-gray-800 rounded-lg p-2.5 text-sm text-white focus:border-gold-500 outline-none resize-none transition-colors"></textarea>
+                </div>
+
+                <div class="pt-1">
+                    <label class="block text-[10px] uppercase text-gray-400 mb-2 tracking-wider font-semibold">Select
+                        Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="pay-btn-bank" onclick="selectPaymentMethod('Bank Transfer')"
+                            class="border border-gold-500 bg-gold-500/10 text-gold-400 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-building-columns"></i> Bank Transfer
+                        </button>
+                        <button type="button" id="pay-btn-cod" onclick="selectPaymentMethod('Cash on Delivery')"
+                            disabled
+                            class="border border-gray-800 bg-[#1a1a1e] text-gray-500 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all opacity-50 cursor-not-allowed">
+                            <i class="fa-solid fa-hand-holding-dollar"></i> Cash on Delivery
+                        </button>
+                    </div>
+                    <p id="cod-notice" class="text-[10px] text-gold-500 mt-2 flex items-center gap-1.5"><i
+                            class="fa-solid fa-circle-info"></i> Cash on Delivery is available exclusively inside
+                        Colombo.</p>
+                </div>
+
+                <div class="border-t border-gray-800 pt-4 mt-2 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] text-gray-400 block mb-0.5">Total Payable:</span>
+                        <span id="checkout-total-val" class="font-serif font-bold text-2xl gold-gradient-text">Rs.
+                            0</span>
+                    </div>
+                    <button type="submit"
+                        class="bg-gradient-to-r from-gold-500 to-gold-700 text-black font-bold px-6 py-3 rounded-full hover:brightness-110 transition-all uppercase tracking-widest text-[11px] shadow-lg shadow-gold-500/20">
+                        Confirm Order
+                    </button>
+                </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoice-modal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div
+            class="bg-[#121214] border border-gray-800 rounded-2xl w-full max-w-md p-6 relative shadow-2xl space-y-6 text-center max-h-[95vh] overflow-y-auto custom-scrollbar">
+
+            <div
+                class="w-16 h-16 bg-emerald-500/10 border-4 border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500 text-2xl mx-auto">
+                <i class="fa-solid fa-check"></i>
+            </div>
+
+            <div
+                class="bg-gold-500/10 border border-gold-500/20 rounded-xl p-3 text-gold-400 text-xs font-medium flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>The Oud & Co. team will message the number you have entered to confirm order.</span>
+            </div>
+
+            <div class="space-y-1">
+                <h3 class="font-serif font-bold text-2xl text-white">Order Received!</h3>
+                <p class="text-xs text-gray-400">Order Reference: <span id="inv-order-id"
+                        class="text-gold-500 font-mono font-bold">#ORD-0000</span></p>
+            </div>
+
+            <div id="inv-details"
+                class="bg-[#1a1a1e] border border-gray-800 rounded-xl p-4 text-left text-xs space-y-2"></div>
+
+            <button onclick="closeInvoiceModal()"
+                class="w-full bg-gradient-to-r from-gold-500 to-gold-700 hover:brightness-110 text-black font-bold py-3 rounded-full uppercase tracking-widest text-[11px] transition-all shadow-lg shadow-gold-500/20">
+                Back to Storefront
+            </button>
         </div>
     </div>
 
     <!-- FIREBASE IMPORTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBqFryRAL-i0DNzyXvki4nfjLcX5EclUzI",
@@ -338,293 +452,301 @@
         const ordersCol = collection(db, "orders");
         const settingsDoc = doc(db, "settings", "siteConfig");
 
-        window.FB = { db, productsCol, ordersCol, settingsDoc, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp, setDoc };
+        window.FB = { db, productsCol, ordersCol, settingsDoc, addDoc, onSnapshot, query, orderBy, serverTimestamp };
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 
+    <!-- MAIN APP LOGIC -->
     <script>
         let products = [];
-        let orders = [];
-        let uploadedProductImageBase64 = '';
-        let listenersAttached = false;
+        let cart = JSON.parse(localStorage.getItem('oud_cart')) || [];
+        let selectedSizes = {};
+        let selectedPayment = 'Bank Transfer';
 
-        document.getElementById('login-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            if (document.getElementById('admin-password').value === 'aaqibahmed2009') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-portal').classList.remove('hidden');
-                if (window.FB) attachListeners();
-                else window.addEventListener('firebase-ready', attachListeners);
-            } else {
-                document.getElementById('login-error').innerText = '❌ Invalid Vault Passcode';
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        });
-
-        window.logoutAdmin = function () {
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('admin-portal').classList.add('hidden');
-            document.getElementById('admin-password').value = '';
-            document.getElementById('login-error').classList.add('hidden');
-        };
-
-        function attachListeners() {
-            if (listenersAttached) return;
-            listenersAttached = true;
-            const { productsCol, ordersCol, settingsDoc, onSnapshot, query, orderBy } = window.FB;
+        window.addEventListener('firebase-ready', () => {
+            const { productsCol, onSnapshot, query, orderBy, settingsDoc } = window.FB;
 
             onSnapshot(query(productsCol, orderBy('createdAt', 'desc')), (snap) => {
                 products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderProductsTable();
-            });
 
-            onSnapshot(query(ordersCol, orderBy('createdAt', 'desc')), (snap) => {
-                orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderOrdersTable();
+                products.forEach(p => {
+                    const active = p.activeSizes || ['5ml', '10ml', '50ml', '100ml'];
+                    if (!selectedSizes[p.id] || !active.includes(selectedSizes[p.id])) {
+                        selectedSizes[p.id] = active.includes('10ml') ? '10ml' : active[0];
+                    }
+                });
+
+                renderProducts();
+            }, (error) => {
+                document.getElementById('products-grid').innerHTML = `<p class="col-span-full text-center text-red-500 py-16">Database connection error. Please refresh.</p>`;
             });
 
             onSnapshot(settingsDoc, (snap) => {
-                const cfg = snap.exists() ? snap.data() : {};
-                document.getElementById('admin-hero-title').value = cfg.heroTitle || '';
-                document.getElementById('admin-hero-sub').value = cfg.heroSubtext || '';
-                if (cfg.heroImage) document.getElementById('hero-preview').style.backgroundImage = `url('${cfg.heroImage}')`;
-            });
-        }
+                if (snap.exists()) {
+                    const cfg = snap.data();
+                    if (cfg.heroTitle) document.getElementById('hero-heading').innerText = cfg.heroTitle;
+                    if (cfg.heroSubtext) document.getElementById('hero-subtext').innerText = cfg.heroSubtext;
 
-        window.switchAdminTab = function (tab) {
-            ['products', 'hero', 'orders'].forEach(t => {
-                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${t}`).className = 'py-2 text-gray-400 hover:text-gold-400';
-            });
-            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-btn-${tab}`).className = 'py-2 border-b-2 border-gold-500 text-gold-400';
-        };
-
-        function renderProductsTable() {
-            const tbody = document.getElementById('admin-products-tbody');
-            if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-500">No products yet.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = products.map(p => {
-                const activeSizes = p.activeSizes || [];
-                return `
-                <tr>
-                    <td class="p-3 font-semibold text-white flex items-center gap-2">
-                        <img src="${p.image}" class="w-8 h-8 rounded object-cover" onerror="this.style.display='none'"> ${p.name}
-                    </td>
-                    <td class="p-3 text-gray-400">${p.house}</td>
-                    <td class="p-3 text-gold-400 font-mono">${activeSizes.join(', ')}</td>
-                    <td class="p-3 text-right whitespace-nowrap">
-                        <button onclick="editProduct('${p.id}')" class="text-gold-400 hover:underline mr-3">Edit</button>
-                        <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:underline">Delete</button>
-                    </td>
-                </tr>
-            `}).join('');
-        }
-
-        function renderOrdersTable() {
-            const tbody = document.getElementById('admin-orders-tbody');
-            if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">No orders yet.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = orders.map(o => `
-                <tr>
-                    <td class="p-3 font-mono text-gold-400">#${o.id.slice(0, 8).toUpperCase()}</td>
-                    <td class="p-3 text-white">${o.customerName}</td>
-                    <td class="p-3">${o.phone}</td>
-                    <td class="p-3 font-bold text-gold-300">Rs. ${(o.total || 0).toLocaleString()}</td>
-                    <td class="p-3">
-                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-obsidian-800 border border-gold-500/30 rounded-lg px-2 py-1 text-[11px] text-white outline-none">
-                            ${['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td class="p-3"><button onclick="viewOrder('${o.id}')" class="text-gold-400 hover:underline text-[11px]">View</button></td>
-                </tr>
-            `).join('');
-        }
-
-        window.updateOrderStatus = async function (orderId, status) {
-            const { db, doc, updateDoc } = window.FB;
-            try { await updateDoc(doc(db, 'orders', orderId), { status }); showToast(`Order marked as ${status}`); } catch (e) { alert(e.message); }
-        };
-
-        window.viewOrder = function (orderId) {
-            const o = orders.find(x => x.id === orderId);
-            if (!o) return;
-            const items = (o.items || []).map(i => `${i.qty}× ${i.name} (${i.size})`).join('\n');
-            alert(`ORDER #${o.id.slice(0, 8).toUpperCase()}\n\nCustomer: ${o.customerName}\nPhone: ${o.phone}\nCity: ${o.city}\nAddress: ${o.address}\n\nITEMS:\n${items}\n\nTOTAL: Rs. ${(o.total || 0).toLocaleString()}`);
-        };
-
-        window.openProductModal = function () {
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('prod-image-url').value = '';
-            document.getElementById('prod-image-preview').style.backgroundImage = '';
-            document.getElementById('prod-active-5ml').checked = true;
-            document.getElementById('prod-active-10ml').checked = true;
-            document.getElementById('prod-active-50ml').checked = true;
-            document.getElementById('prod-active-100ml').checked = true;
-            uploadedProductImageBase64 = '';
-            document.getElementById('product-modal-title').innerText = 'Add New Perfume';
-            document.getElementById('product-modal').classList.remove('hidden');
-        };
-
-        window.closeProductModal = function () { document.getElementById('product-modal').classList.add('hidden'); };
-
-        document.getElementById('product-form').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const { db, productsCol, doc, addDoc, updateDoc, serverTimestamp } = window.FB;
-            const id = document.getElementById('prod-id').value;
-            const btn = document.getElementById('product-submit-btn');
-
-            // Get active sizes dynamically based on what has a price entered AND is checked
-            const activeSizes = [];
-            const p5 = document.getElementById('prod-price-5ml').value;
-            const p10 = document.getElementById('prod-price-10ml').value;
-            const p50 = document.getElementById('prod-price-50ml').value;
-            const p100 = document.getElementById('prod-price-100ml').value;
-
-            if (document.getElementById('prod-active-5ml').checked && p5) activeSizes.push('5ml');
-            if (document.getElementById('prod-active-10ml').checked && p10) activeSizes.push('10ml');
-            if (document.getElementById('prod-active-50ml').checked && p50) activeSizes.push('50ml');
-            if (document.getElementById('prod-active-100ml').checked && p100) activeSizes.push('100ml');
-
-            // Block save if no sizes were filled out
-            if (activeSizes.length === 0) {
-                alert("Please enter a price for at least one size.");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
-
-            const data = {
-                name: document.getElementById('prod-name').value.trim(),
-                house: document.getElementById('prod-house').value.trim(),
-                image: uploadedProductImageBase64 || document.getElementById('prod-image-url').value.trim() || 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=800&auto=format&fit=crop',
-                activeSizes: activeSizes,
-                prices: {
-                    '5ml': p5 ? Number(p5) : 0,
-                    '10ml': p10 ? Number(p10) : 0,
-                    '50ml': p50 ? Number(p50) : 0,
-                    '100ml': p100 ? Number(p100) : 0
-                },
-                notes: {
-                    top: document.getElementById('prod-notes-top').value.trim() || 'N/A',
-                    heart: document.getElementById('prod-notes-heart').value.trim() || 'N/A',
-                    base: document.getElementById('prod-notes-base').value.trim() || 'N/A'
-                },
-                updatedAt: serverTimestamp()
-            };
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'products', id), data);
-                    showToast('Perfume updated!');
-                } else {
-                    data.createdAt = serverTimestamp();
-                    await addDoc(productsCol, data);
-                    showToast('Perfume added!');
+                    // Fade in the custom background image ONLY if it exists in database
+                    if (cfg.heroImage) {
+                        const bgContainer = document.getElementById('hero-bg-container');
+                        bgContainer.style.backgroundImage = `url('${cfg.heroImage}')`;
+                        bgContainer.classList.remove('opacity-0');
+                        bgContainer.classList.add('opacity-40');
+                    }
                 }
-                closeProductModal();
-            } catch (err) { alert('Save failed: ' + err.message); } finally { btn.disabled = false; btn.innerText = 'Save Perfume'; }
+            });
+
+            document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const { ordersCol, addDoc, serverTimestamp } = window.FB;
+                const phone = document.getElementById('cust-phone').value;
+                if (phone.length !== 10) { alert('Please enter a valid 10-digit phone number.'); return; }
+
+                const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+                const orderData = {
+                    customerName: document.getElementById('cust-name').value.trim(),
+                    email: document.getElementById('cust-email').value.trim() || 'N/A',
+                    city: document.getElementById('cust-city').value.trim(),
+                    phone: phone,
+                    address: document.getElementById('cust-address').value.trim(),
+                    payment: selectedPayment,
+                    items: [...cart],
+                    total: subtotal,
+                    status: 'Pending',
+                    createdAt: serverTimestamp()
+                };
+
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerText = 'Placing Order...';
+
+                try {
+                    const ref = await addDoc(ordersCol, orderData);
+                    const shortId = ref.id.slice(0, 6).toUpperCase();
+
+                    document.getElementById('inv-order-id').innerText = 'ORD-' + shortId;
+                    document.getElementById('inv-details').innerHTML = `
+                        <div class="flex justify-between border-b border-gray-800 pb-1.5"><span class="text-gray-400">Customer:</span> <span class="text-white font-medium">${orderData.customerName}</span></div>
+                        <div class="flex justify-between border-b border-gray-800 pb-1.5"><span class="text-gray-400">Phone:</span> <span class="text-white font-medium">${orderData.phone}</span></div>
+                        <div class="flex justify-between border-b border-gray-800 pb-1.5"><span class="text-gray-400">City:</span> <span class="text-white font-medium">${orderData.city}</span></div>
+                        <div class="flex justify-between border-b border-gray-800 pb-1.5"><span class="text-gray-400">Payment Method:</span> <span class="text-white font-medium">${orderData.payment}</span></div>
+                        <div class="flex justify-between pt-1.5"><span class="text-gold-500 font-bold">Total Amount:</span> <span class="text-gold-500 font-bold">Rs. ${subtotal.toLocaleString()}</span></div>
+                    `;
+
+                    closeCheckoutModal();
+                    document.getElementById('invoice-modal').classList.remove('hidden');
+                    cart = []; saveCart(); updateCartUI(); e.target.reset();
+                } catch (err) {
+                    alert('Order could not be placed. Please try again.');
+                } finally {
+                    btn.disabled = false; btn.innerText = 'Confirm Order';
+                }
+            });
         });
 
-        window.editProduct = function (id) {
+        window.renderProducts = function () {
+            const grid = document.getElementById('products-grid');
+            if (products.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-16">No fragrances available yet.</p>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => {
+                const curSize = selectedSizes[p.id];
+                const price = p.prices?.[curSize] || 0;
+                const activeSizes = p.activeSizes || ['5ml', '10ml', '50ml', '100ml'];
+
+                const sizeButtonsHTML = activeSizes.map(s => `
+                    <button onclick="changeProductSize('${p.id}','${s}')" class="py-1.5 rounded-lg text-xs font-semibold border transition-all ${curSize === s ? 'bg-gold-500 text-black border-gold-500' : 'bg-obsidian-800 text-gray-400 border-gray-700 hover:border-gold-500/50'}">${s}</button>
+                `).join('');
+
+                return `
+                    <div class="bg-obsidian-900 border border-gold-500/20 rounded-2xl overflow-hidden hover:border-gold-500/60 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="relative h-64 overflow-hidden bg-obsidian-800">
+                                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-3 left-3 bg-obsidian-900/80 backdrop-blur-md border border-gold-500/30 text-gold-300 text-[10px] uppercase font-bold px-3 py-1 rounded-full">${p.house}</span>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <h3 class="font-serif font-bold text-xl text-white">${p.name}</h3>
+                                <div class="grid gap-1.5" style="grid-template-columns: repeat(${activeSizes.length}, minmax(0, 1fr));">
+                                    ${sizeButtonsHTML}
+                                </div>
+                                <div class="bg-obsidian-800/60 rounded-xl p-3 text-[11px] space-y-1 border border-gold-500/10">
+                                    <div><span class="text-gold-400 font-semibold">Top:</span> ${p.notes?.top || 'N/A'}</div>
+                                    <div><span class="text-gold-400 font-semibold">Heart:</span> ${p.notes?.heart || 'N/A'}</div>
+                                    <div><span class="text-gold-400 font-semibold">Base:</span> ${p.notes?.base || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 pt-0 flex items-center justify-between border-t border-gold-500/10 mt-2">
+                            <div>
+                                <span class="text-[10px] text-gray-400 uppercase block">Price (${curSize})</span>
+                                <span class="font-serif font-bold text-lg gold-gradient-text">Rs. ${price.toLocaleString()}</span>
+                            </div>
+                            <button onclick="addToCart('${p.id}')" class="bg-gold-500/10 hover:bg-gold-500 border border-gold-500/40 text-gold-400 hover:text-black font-semibold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.changeProductSize = (id, size) => { selectedSizes[id] = size; renderProducts(); };
+
+        window.addToCart = (id) => {
             const p = products.find(x => x.id === id);
             if (!p) return;
-            document.getElementById('prod-id').value = p.id;
-            document.getElementById('prod-name').value = p.name;
-            document.getElementById('prod-house').value = p.house;
-
-            // Set values (0 becomes empty string so placeholder shows)
-            document.getElementById('prod-price-5ml').value = p.prices?.['5ml'] || '';
-            document.getElementById('prod-price-10ml').value = p.prices?.['10ml'] || '';
-            document.getElementById('prod-price-50ml').value = p.prices?.['50ml'] || '';
-            document.getElementById('prod-price-100ml').value = p.prices?.['100ml'] || '';
-
-            document.getElementById('prod-image-url').value = p.image;
-            document.getElementById('prod-image-preview').style.backgroundImage = `url('${p.image}')`;
-            document.getElementById('prod-notes-top').value = p.notes?.top || '';
-            document.getElementById('prod-notes-heart').value = p.notes?.heart || '';
-            document.getElementById('prod-notes-base').value = p.notes?.base || '';
-
-            const active = p.activeSizes || [];
-            document.getElementById('prod-active-5ml').checked = active.includes('5ml');
-            document.getElementById('prod-active-10ml').checked = active.includes('10ml');
-            document.getElementById('prod-active-50ml').checked = active.includes('50ml');
-            document.getElementById('prod-active-100ml').checked = active.includes('100ml');
-
-            uploadedProductImageBase64 = p.image;
-            document.getElementById('product-modal-title').innerText = 'Edit Perfume';
-            document.getElementById('product-modal').classList.remove('hidden');
+            const size = selectedSizes[id];
+            const price = p.prices[size];
+            const existing = cart.find(i => i.id === id && i.size === size);
+            if (existing) existing.qty++;
+            else cart.push({ id: p.id, name: p.name, house: p.house, size, price, qty: 1, image: p.image });
+            saveCart(); updateCartUI();
+            showToast(`Added ${p.name} (${size})`);
         };
 
-        window.deleteProduct = async function (id) {
-            if (!confirm('Delete this fragrance?')) return;
-            const { db, doc, deleteDoc } = window.FB;
-            try { await deleteDoc(doc(db, 'products', id)); showToast('Perfume deleted!'); } catch (e) { alert(e.message); }
-        };
+        function saveCart() { localStorage.setItem('oud_cart', JSON.stringify(cart)); }
 
-        function processImageFile(file, callback) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600, MAX_HEIGHT = 800;
-                    let width = img.width, height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    callback(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const badge = document.getElementById('cart-badge');
+            const totalEl = document.getElementById('cart-total-price');
+            badge.innerText = cart.reduce((s, i) => s + i.qty, 0);
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 text-xs py-10">Your decant collection is empty.</p>`;
+                totalEl.innerText = 'Rs. 0';
+                return;
+            }
+            let subtotal = 0;
+            container.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+                return `
+                    <div class="flex items-center justify-between bg-obsidian-800 p-3 rounded-xl border border-gold-500/10">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                            <div>
+                                <h4 class="font-serif text-xs font-bold text-white">${item.name}</h4>
+                                <span class="text-[10px] text-gold-400 uppercase">${item.size} • Rs. ${item.price.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 bg-obsidian-900 text-gray-400 rounded hover:text-gold-400 text-xs">-</button>
+                                <span class="text-xs font-bold text-white w-4 text-center">${item.qty}</span>
+                                <button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 bg-obsidian-900 text-gray-400 rounded hover:text-gold-400 text-xs">+</button>
+                            </div>
+                            <button onclick="removeFromCart(${idx})" class="text-red-500 hover:text-red-400 ml-1 transition-colors" title="Remove item">
+                                <i class="fa-solid fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            totalEl.innerText = `Rs. ${subtotal.toLocaleString()}`;
         }
 
-        document.getElementById('file-prod').addEventListener('change', function (e) {
-            const file = e.target.files[0]; if (!file) return;
-            processImageFile(file, (base64) => {
-                uploadedProductImageBase64 = base64;
-                document.getElementById('prod-image-preview').style.backgroundImage = `url('${base64}')`;
-                document.getElementById('prod-image-url').value = '';
-                showToast('Image ready to save!');
-            });
-        });
-
-        document.getElementById('file-hero').addEventListener('change', function (e) {
-            const file = e.target.files[0]; if (!file) return;
-            processImageFile(file, async (base64) => {
-                document.getElementById('hero-preview').style.backgroundImage = `url('${base64}')`;
-                const { settingsDoc, updateDoc, setDoc } = window.FB;
-                try { await updateDoc(settingsDoc, { heroImage: base64 }); }
-                catch (err) { if (err.code === 'not-found') await setDoc(settingsDoc, { heroImage: base64 }, { merge: true }); }
-                showToast('Hero image saved!');
-            });
-        });
-
-        window.saveHeroText = async function () {
-            const { settingsDoc, updateDoc, setDoc } = window.FB;
-            const data = { heroTitle: document.getElementById('admin-hero-title').value.trim(), heroSubtext: document.getElementById('admin-hero-sub').value.trim() };
-            try { await updateDoc(settingsDoc, data); }
-            catch (err) { if (err.code === 'not-found') await setDoc(settingsDoc, data, { merge: true }); }
-            showToast('Hero text saved!');
+        window.removeFromCart = (idx) => {
+            cart.splice(idx, 1);
+            saveCart();
+            updateCartUI();
+            showToast("Item removed from cart");
         };
 
-        function showToast(msg) {
+        window.updateCartQty = (idx, change) => {
+            cart[idx].qty += change;
+            if (cart[idx].qty <= 0) cart.splice(idx, 1);
+            saveCart(); updateCartUI();
+        };
+
+        // UI HELPERS
+        window.toggleCartDrawer = function () {
+            document.getElementById('cart-drawer').classList.toggle('translate-x-full');
+            document.getElementById('cart-backdrop').classList.toggle('hidden');
+        };
+
+        window.toggleMobileMenu = function () {
+            const m = document.getElementById('mobile-menu');
+            m.classList.toggle('hidden');
+            m.classList.toggle('flex');
+        };
+
+        window.openCheckoutModal = function () {
+            if (cart.length === 0) { showToast("Please add perfumes to your cart first!"); return; }
+            document.getElementById('cart-drawer').classList.add('translate-x-full');
+            document.getElementById('cart-backdrop').classList.add('hidden');
+
+            const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            document.getElementById('checkout-total-val').innerText = `Rs. ${subtotal.toLocaleString()}`;
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        };
+
+        window.closeCheckoutModal = function () {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        };
+
+        window.backToCart = function () {
+            closeCheckoutModal();
+            toggleCartDrawer();
+        };
+
+        window.closeInvoiceModal = function () {
+            document.getElementById('invoice-modal').classList.add('hidden');
+        };
+
+        window.validateSLPhoneNumber = function (input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        };
+
+        window.checkCityForCOD = function () {
+            const city = document.getElementById('cust-city').value.trim().toLowerCase();
+            const codBtn = document.getElementById('pay-btn-cod');
+            if (codBtn) {
+                if (city === 'colombo') {
+                    codBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    codBtn.disabled = false;
+                } else {
+                    codBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    codBtn.disabled = true;
+                }
+            }
+        };
+
+        window.selectPaymentMethod = function (method) {
+            selectedPayment = method;
+            const bankBtn = document.getElementById('pay-btn-bank');
+            const codBtn = document.getElementById('pay-btn-cod');
+            const city = document.getElementById('cust-city').value.trim().toLowerCase();
+
+            if (method === 'Bank Transfer') {
+                bankBtn.className = 'border border-gold-500 bg-gold-500/10 text-gold-400 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all';
+                if (city === 'colombo') {
+                    codBtn.className = 'border border-gray-800 bg-[#1a1a1e] text-gray-300 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:border-gold-500/50';
+                    codBtn.disabled = false;
+                } else {
+                    codBtn.className = 'border border-gray-800 bg-[#1a1a1e] text-gray-500 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all opacity-50 cursor-not-allowed';
+                    codBtn.disabled = true;
+                }
+            } else {
+                codBtn.className = 'border border-gold-500 bg-gold-500/10 text-gold-400 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all';
+                bankBtn.className = 'border border-gray-800 bg-[#1a1a1e] text-gray-300 font-bold py-2.5 rounded-lg text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:border-gold-500/50';
+            }
+        };
+
+        window.showToast = function (msg) {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = 'bg-obsidian-800 border-l-4 border-l-gold-500 border border-gold-500/20 text-gold-300 px-4 py-3 rounded-xl shadow-2xl text-xs flex items-center gap-2 pointer-events-auto';
             t.innerHTML = `<i class="fa-solid fa-circle-check text-gold-400"></i> ${msg}`;
             c.appendChild(t);
             setTimeout(() => t.remove(), 3000);
-        }
+        };
+
+        // Initialize cart display on load
+        updateCartUI();
     </script>
 </body>
 
